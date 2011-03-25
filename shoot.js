@@ -71,16 +71,29 @@ var init = function() {
   // var moveControls = ['w', 'a', 's', 'd'];
 
   $(window).bind('keydown', 'w', function() {
-    player.move(config.controls['w']);
+    player.appendMovement(config.controls['w']);
   });
   $(window).bind('keydown', 'a', function() {
-    player.move(config.controls['a']);
+    player.appendMovement(config.controls['a']);
   });
   $(window).bind('keydown', 's', function() {
-    player.move(config.controls['s']);
+    player.appendMovement(config.controls['s']);
   });
   $(window).bind('keydown', 'd', function() {
-    player.move(config.controls['d']);
+    player.appendMovement(config.controls['d']);
+  });
+  
+  $(window).bind('keyup', 'w', function() {
+    player.popMovement(config.controls['w']);
+  });
+  $(window).bind('keyup', 'a', function() {
+    player.popMovement(config.controls['a']);
+  });
+  $(window).bind('keyup', 's', function() {
+    player.popMovement(config.controls['s']);
+  });
+  $(window).bind('keyup', 'd', function() {
+    player.popMovement(config.controls['d']);
   });
 
   renderer.scene.push(crossHair);
@@ -107,11 +120,27 @@ var CrossHair = function(player) {
 var Player = function(x, y) {
   var self = this;
   self.position = new Vector(x, y);
-  self.speed = 5;
-  self.move = function(direction) {
-    self.position.add(new Vector().add(direction).scale(self.speed));
+  self.speed = 2;
+  self.moveMent = [];
+  self.move = function() {
+    var direction = new Vector();
+    for (i in self.moveMent) {
+      direction.add(self.moveMent[i]);
+    }
+    direction.scale(self.speed);
+    self.position.add(direction);
+  };
+  self.appendMovement = function(direction) {
+    if (self.moveMent.indexOf(direction) === -1)
+      self.moveMent.push(direction);
+  };
+  self.popMovement = function(direction) {
+    var pos = self.moveMent.indexOf(direction);
+    if (pos >= 0)
+      self.moveMent.splice(pos, 1);
   };
   self.redraw = function(ctx) {
+    self.move();
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 1;
     ctx.beginPath();
