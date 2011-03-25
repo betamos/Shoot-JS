@@ -54,21 +54,21 @@ var init = function() {
   $('#game').append(canvas);
   var renderer = new renderEngine(canvas);
   renderer.clear();
-  var crossHair = new CrossHair();
+  
+  var player = new Player(100, 100);
+  var crossHair = new CrossHair(player);
   var interval = setInterval(renderer.redraw, 15);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
     var y = e.pageY - this.offsetTop;
-    crossHair.x = x;
-    crossHair.y = y;
+    crossHair.position.x = x;
+    crossHair.position.y = y;
   });
   
   canvas.css('cursor', 'none');
   
   // var moveControls = ['w', 'a', 's', 'd'];
-  
-  var player = new Player(100, 100);
 
   $(window).bind('keydown', 'w', function() {
     player.move(config.controls['w']);
@@ -87,18 +87,19 @@ var init = function() {
   renderer.scene.push(player);
 };
 
-var CrossHair = function() {
+var CrossHair = function(player) {
   var self = this;
   
-  self.x = 0;
-  self.y = 0;
+  self.position = new Vector();
   self.radius = 15;
   
   self.redraw = function(ctx) {
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(self.x, self.y, self.radius, 0, 2 * Math.PI, false);
+    ctx.arc(self.position.x, self.position.y, self.radius, 0, 2 * Math.PI, false);
+    ctx.moveTo(player.position.x, player.position.y);
+    ctx.lineTo(self.position.x, self.position.y);
     ctx.stroke();
   };
 };
@@ -108,12 +109,7 @@ var Player = function(x, y) {
   self.position = new Vector(x, y);
   self.speed = 5;
   self.move = function(direction) {
-    var e = new Vector();
-    l(direction);
-    e.add(direction);
-    e.scale(self.speed);
-    //l(e);
-    self.position.add(e);
+    self.position.add(new Vector().add(direction).scale(self.speed));
   };
   self.redraw = function(ctx) {
     ctx.strokeStyle = 'red';
