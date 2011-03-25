@@ -75,7 +75,12 @@ var Vector = Class.extend({
     this.x += vector.x;
     this.y += vector.y;
     return this;
-  }
+  },
+  setLength : function(length) {
+    var norm = this.norm();
+    this.x = this.x * length / norm;
+    this.y = this.y * length / norm;
+  },
 });
 
 

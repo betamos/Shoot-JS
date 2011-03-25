@@ -95,6 +95,15 @@ var init = function() {
   $(window).bind('keyup', 'd', function() {
     player.popMovement(config.controls['d']);
   });
+  
+  canvas.click(function(e) {
+    // Shoot
+    var direction = new Vector().add(crossHair.position).add(new Vector().add(player.position).scale(-1));
+    // Rescale
+    direction.setLength(4);
+    var bullet = new Bullet(player.position, direction);
+    renderer.scene.push(bullet);
+  });
 
   renderer.scene.push(crossHair);
   renderer.scene.push(player);
@@ -148,6 +157,26 @@ var Player = function(x, y) {
     ctx.stroke();
   };
 };
+
+var Bullet = Class.extend({
+  position : null,
+  movement : null,
+  init : function(position, movement) {
+    // TODO: Clone
+    this.position = new Vector(position.x, position.y);
+    this.movement = new Vector(movement.x, movement.y);
+  },
+  move : function() {
+    this.position.add(this.movement);
+  },
+  redraw : function(ctx) {
+    this.move();
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(this.position.x, this.position.y, 3, 0, 2 * Math.PI, false);
+    ctx.fill();
+  },
+});
 
 window.onload = function() {
   init();
