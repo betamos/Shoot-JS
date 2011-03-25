@@ -158,16 +158,9 @@ var Player = function(x, y) {
   };
 };
 
-var Bullet = Class.extend({
-  position : null,
-  movement : null,
-  init : function(position, movement) {
-    // TODO: Clone
-    this.position = new Vector(position.x, position.y);
-    this.movement = new Vector(movement.x, movement.y);
-  },
+var Bullet = PointVector.extend({
   move : function() {
-    this.position.add(this.movement);
+    this.position.add(this.direction);
   },
   redraw : function(ctx) {
     this.move();

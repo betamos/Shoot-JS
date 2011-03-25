@@ -95,8 +95,8 @@ var PointVector = Class.extend({
    * @param Point point
    * @param Vector vector
    */
-  init : function(point, vector) {
-    this.point = point;
-    this.vector = vector;
+  init : function(position, direction) {
+    this.position = new Vector(position.x, position.y);
+    this.direction = new Vector(direction.x, direction.y);
   }
 });
