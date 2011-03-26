@@ -100,3 +100,14 @@ var PointVector = Class.extend({
     this.direction = new Vector(direction.x, direction.y);
   }
 });
+
+/**
+ * Collision library
+ */
+
+window.Collisions = {
+  inside : function(x, y, top, right, bottom, left) {
+    //x,y are the point, l,r,b,t are the extents of the rectangle
+    return x > left && x < right && y > bottom && y < top;
+  }
+};
