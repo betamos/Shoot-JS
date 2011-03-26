@@ -30,8 +30,8 @@ var config = {
 var renderEngine = function(canvas) {
   var self = this;
   var ctx = canvas.get(0).getContext('2d');
-  canvas.attr("width", config.canvasWidth);
-  canvas.attr("height", config.canvasHeight);
+  canvas.attr('width', config.canvasWidth);
+  canvas.attr('height', config.canvasHeight);
   
   ctx.scale(1, -1);
   ctx.translate(0, -1 * config.canvasHeight);
@@ -72,18 +72,25 @@ var init = function() {
   canvas.css('cursor', 'none');
   
   // var moveControls = ['w', 'a', 's', 'd'];
-
-  $(window).bind('keydown', function(e) {
-    var direction = config.controls[e.keyCode];
-    if (typeof direction !== 'undefined')
-      player.appendMovement(direction);
-  });
   
-  $(window).bind('keyup', function(e) {
+  var keyHandler = function(e) {
+    console.log(e.originalEvent.type);
     var direction = config.controls[e.keyCode];
-    if (typeof direction !== 'undefined')
+    if (typeof direction === 'undefined')
+      return true;
+    switch (e.originalEvent.type) {
+    case 'keydown':
+      player.appendMovement(direction);
+      break;
+    case 'keyup':
       player.popMovement(direction);
-  });
+      break;
+    }
+    return false;
+  };
+
+  $(window).bind('keydown', keyHandler);
+  $(window).bind('keyup', keyHandler);
 
   var block = new Block(175, 350, 100, 300);
   
