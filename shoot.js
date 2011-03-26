@@ -10,20 +10,20 @@ var l = function(msg) {
 };
 
 var direction = {
-  UP : new Vector(0, -1),
+  UP : new Vector(0, 1),
   RIGHT : new Vector(1, 0),
-  DOWN : new Vector(0, 1),
+  DOWN : new Vector(0, -1),
   LEFT : new Vector(-1, 0),
 };
 
 var config = {
   canvasWidth : 800,
   canvasHeight : 300,
-  controls : {
-    'w' : direction.UP,
-    'd' : direction.RIGHT,
-    's' : direction.DOWN,
-    'a' : direction.LEFT,
+  controls : { // W, A, S, D
+    87 : direction.UP,
+    68 : direction.RIGHT,
+    83 : direction.DOWN,
+    65 : direction.LEFT,
   },
 };
 
@@ -32,6 +32,9 @@ var renderEngine = function(canvas) {
   var ctx = canvas.get(0).getContext('2d');
   canvas.attr("width", config.canvasWidth);
   canvas.attr("height", config.canvasHeight);
+  
+  ctx.scale(1, -1);
+  ctx.translate(0, -1 * config.canvasHeight);
   
   self.scene = [];
   
@@ -61,7 +64,7 @@ var init = function() {
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
-    var y = e.pageY - this.offsetTop;
+    var y = config.canvasHeight - (e.pageY - this.offsetTop);
     crossHair.position.x = x;
     crossHair.position.y = y;
   });
@@ -70,31 +73,19 @@ var init = function() {
   
   // var moveControls = ['w', 'a', 's', 'd'];
 
-  $(window).bind('keydown', 'w', function() {
-    player.appendMovement(config.controls['w']);
-  });
-  $(window).bind('keydown', 'a', function() {
-    player.appendMovement(config.controls['a']);
-  });
-  $(window).bind('keydown', 's', function() {
-    player.appendMovement(config.controls['s']);
-  });
-  $(window).bind('keydown', 'd', function() {
-    player.appendMovement(config.controls['d']);
+  $(window).bind('keydown', function(e) {
+    var direction = config.controls[e.keyCode];
+    if (typeof direction !== 'undefined')
+      player.appendMovement(direction);
   });
   
-  $(window).bind('keyup', 'w', function() {
-    player.popMovement(config.controls['w']);
+  $(window).bind('keyup', function(e) {
+    var direction = config.controls[e.keyCode];
+    if (typeof direction !== 'undefined')
+      player.popMovement(direction);
   });
-  $(window).bind('keyup', 'a', function() {
-    player.popMovement(config.controls['a']);
-  });
-  $(window).bind('keyup', 's', function() {
-    player.popMovement(config.controls['s']);
-  });
-  $(window).bind('keyup', 'd', function() {
-    player.popMovement(config.controls['d']);
-  });
+
+  var block = new Block(175, 350, 100, 300);
   
   canvas.click(function(e) {
     // Shoot
@@ -103,8 +94,12 @@ var init = function() {
     direction.setLength(4);
     var bullet = new Bullet(player.position, direction);
     renderer.scene.push(bullet);
+    
+    block.detectCollision(bullet, 'remove');
+    // TODO: return false?
   });
 
+  renderer.scene.push(block);
   renderer.scene.push(crossHair);
   renderer.scene.push(player);
 };
@@ -168,6 +163,36 @@ var Bullet = PointVector.extend({
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, 3, 0, 2 * Math.PI, false);
     ctx.fill();
+  },
+});
+
+var Block = Class.extend({
+  collisions : [],
+  init : function(top, right, bottom, left) {
+    this.top = top;
+    this.right = right;
+    this.bottom = bottom;
+    this.left = left;
+  },
+  redraw : function(ctx) {
+    this.collision();
+    ctx.fillStyle = 'green';
+    ctx.fillRect(this.left, this.bottom, this.right-this.left, this.top-this.bottom);
+  },
+  detectCollision : function(object, action) {
+    this.collisions.push({
+      object : object,
+      action : action,
+    });
+  },
+  collision : function() {
+    for (var i = this.collisions.length-1; i >= 0; i--) {
+      var position = this.collisions[i].object.position;
+      if (window.Collisions.inside(position.x, position.y, this.top, this.right, this.bottom, this.left)) {
+        this.collisions.splice(i, 1);
+        console.log('collision');
+      }
+    }
   },
 });
 
