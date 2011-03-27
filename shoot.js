@@ -77,8 +77,6 @@ $(document).ready(function() {
   thisPlayer.color = 'red';
   var crossHair = new CrossHair(thisPlayer);
   
-  var otherPlayer = new Player(530, 120);
-  
   var interval = setInterval(renderer.redraw, config.frameRate);
   
   canvas.mousemove(function(e) {
@@ -137,5 +135,10 @@ $(document).ready(function() {
   renderer.scene.houses.push(block2);
   renderer.scene.hud.push(crossHair);
   renderer.scene.players.push(thisPlayer);
-  renderer.scene.players.push(otherPlayer);
+  renderer.scene.players.push(
+    thisPlayer,
+    new Player(530, 120),
+    new Player(150, 25),
+    new Player(180, 20)
+  );
 });

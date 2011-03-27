@@ -65,7 +65,8 @@ var Bullet = PointVector.extend({
   init : function(position, direction) {
     this.shape = 'point';
     this.color = 'yellow';
-    this._super(position, direction);
+    this.speed = 2;
+    this._super(position, direction.scale(this.speed));
   },
   move : function() {
     this.position.add(this.direction);
