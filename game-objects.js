@@ -25,6 +25,8 @@ var Player = Class.extend({
     this.speed = 2;
     this.color = 'purple';
     this.moveMent = [];
+    // The side of the square of the bounding box which is affected by collision
+    this.boundingBoxSize = 16;
   },
   move : function() {
     var direction = new Vector();
@@ -46,11 +48,16 @@ var Player = Class.extend({
   },
   redraw : function(ctx) {
     this.move();
-    ctx.strokeStyle = 'red';
+    this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
+    ctx.strokeStyle = this.color;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, 5, 0, 2 * Math.PI, false);
     ctx.stroke();
+  },
+  exportShape : function() {
+    return new Rectangle(this.position.x - this.boundingBoxSize / 2,
+      this.position.y - this.boundingBoxSize / 2, this.boundingBoxSize, this.boundingBoxSize);
   }
 });
 
@@ -78,8 +85,7 @@ var Bullet = PointVector.extend({
 var Block = Rectangle.extend({
   shape : 'rectangle',
   redraw : function(ctx) {
-    ctx.fillStyle = 'green';
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    this.fill(ctx, 'green');
   },
   exportShape : function() {
     return this;
