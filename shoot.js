@@ -18,6 +18,8 @@ var config = {
     83 : direction.DOWN,
     65 : direction.LEFT,
   },
+  // Milliseconds between frame, higher is slower
+  frameRate : 15
 };
 
 var liveDebug;
@@ -71,9 +73,13 @@ $(document).ready(function() {
   var renderer = new RenderEngine(canvas);
   renderer.clear();
   
-  var player = new Player(100, 100);
-  var crossHair = new CrossHair(player);
-  var interval = setInterval(renderer.redraw, 13);
+  var thisPlayer = new Player(100, 100);
+  thisPlayer.color = 'red';
+  var crossHair = new CrossHair(thisPlayer);
+  
+  var otherPlayer = new Player(530, 120);
+  
+  var interval = setInterval(renderer.redraw, config.frameRate);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
@@ -92,10 +98,10 @@ $(document).ready(function() {
       return true;
     switch (e.originalEvent.type) {
     case 'keydown':
-      player.appendMovement(direction);
+      thisPlayer.appendMovement(direction);
       break;
     case 'keyup':
-      player.popMovement(direction);
+      thisPlayer.popMovement(direction);
       break;
     }
     return false;
@@ -109,24 +115,27 @@ $(document).ready(function() {
   
   canvas.click(function(e) {
     // Shoot
-    var direction = new Vector().add(crossHair.position).add(new Vector().add(player.position).scale(-1));
+    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
     // Rescale
     direction.setLength(4);
-    var bullet = new Bullet(player.position, direction);
+    var bullet = new Bullet(thisPlayer.position, direction);
     renderer.scene.bullets.push(bullet);
     // TODO: return false?
   });
   
-  Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(o1, o2) {
-    // o1 is the Bullet, o2 is the Rectangle
-    o1.color = 'red';
-    var pos = renderer.scene.bullets.indexOf(o1);
-    if (pos >= 0)
-      renderer.scene.bullets.splice(pos, 1);
+  Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(bullet, house) {
+    bullet.color = 'red';
+    removeArrayObject(renderer.scene.bullets, bullet);
+  });
+  
+  Collisions.startDetect(renderer.scene.bullets, renderer.scene.players, function(bullet, player) {
+    if (player !== thisPlayer)
+      removeArrayObject(renderer.scene.players, player);
   });
 
   renderer.scene.houses.push(block1);
   renderer.scene.houses.push(block2);
   renderer.scene.hud.push(crossHair);
-  renderer.scene.players.push(player);
+  renderer.scene.players.push(thisPlayer);
+  renderer.scene.players.push(otherPlayer);
 });
