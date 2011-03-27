@@ -152,7 +152,7 @@ var Collisions = {
     });
   },
   runDetections : function() {
-    for (i in this.observedObjects) {
+    for (var i in this.observedObjects) {
       // Now we have two arrays
       // Easy access: array1, array2, callback
       with (this.observedObjects[i]) {
