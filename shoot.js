@@ -22,7 +22,7 @@ var config = {
 
 var liveDebug;
 
-var renderEngine = function(canvas) {
+var RenderEngine = function(canvas) {
   var self = this;
   var ctx = canvas.get(0).getContext('2d');
   canvas.attr('width', config.canvasWidth);
@@ -68,7 +68,7 @@ $(document).ready(function() {
   
   var canvas = $('<canvas />');
   $('#game').append(canvas);
-  var renderer = new renderEngine(canvas);
+  var renderer = new RenderEngine(canvas);
   renderer.clear();
   
   var player = new Player(100, 100);
