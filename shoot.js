@@ -159,6 +159,7 @@ var Player = function(x, y) {
     for (i in self.moveMent) {
       direction.add(self.moveMent[i]);
     }
+    direction.setLength(1);
     direction.scale(self.speed);
     self.position.add(direction);
   };
