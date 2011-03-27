@@ -78,6 +78,9 @@ var Vector = Class.extend({
   },
   setLength : function(length) {
     var norm = this.norm();
+    // Don't affect the zero vector
+    if (norm === 0)
+      return;
     this.x = this.x * length / norm;
     this.y = this.y * length / norm;
   },
