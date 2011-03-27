@@ -32,3 +32,13 @@ var Timer = Class.extend({
     this.steps = [];
   }
 });
+
+var removeArrayObject = function(arr, obj) {
+  var pos = arr.indexOf(obj);
+  if (pos >= 0) {
+    arr.splice(pos, 1);
+    return true;
+  }
+  else
+    return false;
+};
