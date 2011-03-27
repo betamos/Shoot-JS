@@ -36,7 +36,13 @@ var renderEngine = function(canvas) {
   ctx.scale(1, -1);
   ctx.translate(0, -1 * config.canvasHeight);
   
-  self.scene = [];
+  // Orscending from bottom to top in z-index
+  self.scene = {
+    bullets : [],
+    houses : [],
+    players : [],
+    hud : [],
+  };
   
   self.clear = function(color) {
     ctx.fillStyle = 'black';
@@ -44,10 +50,12 @@ var renderEngine = function(canvas) {
   };
   
   self.redraw = function() {
+    window.Collisions.runDetections();
     // l('redraw');
     self.clear();
-    for (i in self.scene) {
-      self.scene[i].redraw(ctx);
+    for (var i in self.scene) {
+      for (var j in self.scene[i])
+        self.scene[i][j].redraw(ctx);
     }
   };
 };
@@ -69,12 +77,11 @@ var init = function() {
     crossHair.position.y = y;
   });
   
-  canvas.css('cursor', 'none');
+  // canvas.css('cursor', 'none');
   
   // var moveControls = ['w', 'a', 's', 'd'];
   
   var keyHandler = function(e) {
-    console.log(e.originalEvent.type);
     var direction = config.controls[e.keyCode];
     if (typeof direction === 'undefined')
       return true;
@@ -92,7 +99,8 @@ var init = function() {
   $(window).bind('keydown', keyHandler);
   $(window).bind('keyup', keyHandler);
 
-  var block = new Block(175, 350, 100, 300);
+  var block1 = new Block(10, 10, 100, 80);
+  var block2 = new Block(300, 100, 200, 75);
   
   canvas.click(function(e) {
     // Shoot
@@ -100,15 +108,22 @@ var init = function() {
     // Rescale
     direction.setLength(4);
     var bullet = new Bullet(player.position, direction);
-    renderer.scene.push(bullet);
-    
-    block.detectCollision(bullet, 'remove');
+    renderer.scene.bullets.push(bullet);
     // TODO: return false?
   });
+  
+  window.Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(o1, o2) {
+    console.log(o1);
+    o1.color = 'red';
+    var pos = renderer.scene.bullets.indexOf(o1);
+    if (pos >= 0)
+      renderer.scene.bullets.splice(pos, 1);
+  });
 
-  renderer.scene.push(block);
-  renderer.scene.push(crossHair);
-  renderer.scene.push(player);
+  renderer.scene.houses.push(block1);
+  renderer.scene.houses.push(block2);
+  renderer.scene.hud.push(crossHair);
+  renderer.scene.players.push(player);
 };
 
 var CrossHair = function(player) {
@@ -128,6 +143,7 @@ var CrossHair = function(player) {
   };
 };
 
+// TODO Inherit from Class.js, makes it easier with collision detection.
 var Player = function(x, y) {
   var self = this;
   self.position = new Vector(x, y);
@@ -161,46 +177,35 @@ var Player = function(x, y) {
 };
 
 var Bullet = PointVector.extend({
+  init : function(position, direction) {
+    this.shape = 'point';
+    this.color = 'yellow';
+    this._super(position, direction);
+  },
   move : function() {
     this.position.add(this.direction);
   },
   redraw : function(ctx) {
     this.move();
-    ctx.fillStyle = 'yellow';
+    ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.arc(this.position.x, this.position.y, 3, 0, 2 * Math.PI, false);
     ctx.fill();
   },
+  exportShape : function() {
+    return this.position;
+  }
 });
 
-var Block = Class.extend({
-  collisions : [],
-  init : function(top, right, bottom, left) {
-    this.top = top;
-    this.right = right;
-    this.bottom = bottom;
-    this.left = left;
-  },
+var Block = Rectangle.extend({
+  shape : 'rectangle',
   redraw : function(ctx) {
-    this.collision();
     ctx.fillStyle = 'green';
-    ctx.fillRect(this.left, this.bottom, this.right-this.left, this.top-this.bottom);
+    ctx.fillRect(this.x, this.y, this.width, this.height);
   },
-  detectCollision : function(object, action) {
-    this.collisions.push({
-      object : object,
-      action : action,
-    });
-  },
-  collision : function() {
-    for (var i = this.collisions.length-1; i >= 0; i--) {
-      var position = this.collisions[i].object.position;
-      if (window.Collisions.inside(position.x, position.y, this.top, this.right, this.bottom, this.left)) {
-        this.collisions.splice(i, 1);
-        console.log('collision');
-      }
-    }
-  },
+  exportShape : function() {
+    return this;
+  }
 });
 
 window.onload = function() {
