@@ -4,11 +4,6 @@
 
 (function() {
 
-var l = function(msg) {
-  if (window.console)
-    console.log(msg);
-};
-
 var direction = {
   UP : new Vector(0, 1),
   RIGHT : new Vector(1, 0),
@@ -68,7 +63,7 @@ var init = function() {
   
   var player = new Player(100, 100);
   var crossHair = new CrossHair(player);
-  var interval = setInterval(renderer.redraw, 15);
+  var interval = setInterval(renderer.redraw, 10);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
@@ -113,7 +108,7 @@ var init = function() {
   });
   
   window.Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(o1, o2) {
-    console.log(o1);
+    // o1 is the Bullet, o2 is the Rectangle
     o1.color = 'red';
     var pos = renderer.scene.bullets.indexOf(o1);
     if (pos >= 0)
