@@ -48,7 +48,7 @@ var renderEngine = function(canvas) {
   
   self.redraw = function() {
     timer.start();
-    window.Collisions.runDetections();
+    Collisions.runDetections();
     // l('redraw');
     self.clear();
     for (var i in self.scene) {
@@ -117,7 +117,7 @@ var init = function() {
     // TODO: return false?
   });
   
-  window.Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(o1, o2) {
+  Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(o1, o2) {
     // o1 is the Bullet, o2 is the Rectangle
     o1.color = 'red';
     var pos = renderer.scene.bullets.indexOf(o1);

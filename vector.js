@@ -117,7 +117,7 @@ var Rectangle = Class.extend({
  * Collision library
  */
 
-window.Collisions = {
+var Collisions = {
   // Vector point, Rectangle rect
   pointInRectangle : function(point, rect) {
     if (point instanceof Vector && rect instanceof Rectangle)
