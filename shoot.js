@@ -149,38 +149,40 @@ var CrossHair = function(player) {
 };
 
 // TODO Inherit from Class.js, makes it easier with collision detection.
-var Player = function(x, y) {
-  var self = this;
-  self.position = new Vector(x, y);
-  self.speed = 2;
-  self.moveMent = [];
-  self.move = function() {
+var Player = Class.extend({
+  init : function(x, y) {
+    this.position = new Vector(x, y);
+    this.speed = 2;
+    this.color = 'purple';
+    this.moveMent = [];
+  },
+  move : function() {
     var direction = new Vector();
-    for (i in self.moveMent) {
-      direction.add(self.moveMent[i]);
+    for (i in this.moveMent) {
+      direction.add(this.moveMent[i]);
     }
     direction.setLength(1);
-    direction.scale(self.speed);
-    self.position.add(direction);
-  };
-  self.appendMovement = function(direction) {
-    if (self.moveMent.indexOf(direction) === -1)
-      self.moveMent.push(direction);
-  };
-  self.popMovement = function(direction) {
-    var pos = self.moveMent.indexOf(direction);
+    direction.scale(this.speed);
+    this.position.add(direction);
+  },
+  appendMovement : function(direction) {
+    if (this.moveMent.indexOf(direction) === -1)
+      this.moveMent.push(direction);
+  },
+  popMovement : function(direction) {
+    var pos = this.moveMent.indexOf(direction);
     if (pos >= 0)
-      self.moveMent.splice(pos, 1);
-  };
-  self.redraw = function(ctx) {
-    self.move();
+      this.moveMent.splice(pos, 1);
+  },
+  redraw : function(ctx) {
+    this.move();
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(self.position.x, self.position.y, 5, 0, 2 * Math.PI, false);
+    ctx.arc(this.position.x, this.position.y, 5, 0, 2 * Math.PI, false);
     ctx.stroke();
-  };
-};
+  }
+});
 
 var Bullet = PointVector.extend({
   init : function(position, direction) {
