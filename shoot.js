@@ -60,7 +60,7 @@ var renderEngine = function(canvas) {
   };
 };
 
-var init = function() {
+$(document).ready(function() {
   
   liveDebug = {
     frameTime : $('#frame-time')
@@ -129,7 +129,7 @@ var init = function() {
   renderer.scene.houses.push(block2);
   renderer.scene.hud.push(crossHair);
   renderer.scene.players.push(player);
-};
+});
 
 var CrossHair = function(player) {
   var self = this;
@@ -213,7 +213,3 @@ var Block = Rectangle.extend({
     return this;
   }
 });
-
-window.onload = function() {
-  init();
-};
