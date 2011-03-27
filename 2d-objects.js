@@ -111,6 +111,10 @@ var Rectangle = Class.extend({
     this.width = width;
     this.height = height;
   },
+  fill : function(ctx, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+  },
 });
 
 /**
