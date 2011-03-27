@@ -2,8 +2,6 @@
  * 
  */
 
-(function() {
-
 var direction = {
   UP : new Vector(0, 1),
   RIGHT : new Vector(1, 0),
@@ -22,6 +20,8 @@ var config = {
   },
 };
 
+var liveDebug;
+
 var renderEngine = function(canvas) {
   var self = this;
   var ctx = canvas.get(0).getContext('2d');
@@ -31,7 +31,7 @@ var renderEngine = function(canvas) {
   ctx.scale(1, -1);
   ctx.translate(0, -1 * config.canvasHeight);
   
-  // Orscending from bottom to top in z-index
+  // Ascending from bottom to top in z-index
   self.scene = {
     bullets : [],
     houses : [],
@@ -44,7 +44,10 @@ var renderEngine = function(canvas) {
     ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight);
   };
   
+  var timer = new Timer();
+  
   self.redraw = function() {
+    timer.start();
     window.Collisions.runDetections();
     // l('redraw');
     self.clear();
@@ -52,10 +55,17 @@ var renderEngine = function(canvas) {
       for (var j in self.scene[i])
         self.scene[i][j].redraw(ctx);
     }
+    timer.stop();
+    liveDebug.frameTime.text(timer.getTime());
   };
 };
 
 var init = function() {
+  
+  liveDebug = {
+    frameTime : $('#frame-time')
+  };
+  
   var canvas = $('<canvas />');
   $('#game').append(canvas);
   var renderer = new renderEngine(canvas);
@@ -63,7 +73,7 @@ var init = function() {
   
   var player = new Player(100, 100);
   var crossHair = new CrossHair(player);
-  var interval = setInterval(renderer.redraw, 10);
+  var interval = setInterval(renderer.redraw, 13);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
@@ -206,5 +216,3 @@ var Block = Rectangle.extend({
 window.onload = function() {
   init();
 };
-
-})(jQuery);
