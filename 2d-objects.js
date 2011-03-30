@@ -131,12 +131,25 @@ var Collisions = {
       console.error('Type error!');
   },
   /**
+   * @param Rectangle r1 The first rectangle
+   * @param Rectangle r2 The other rectangle
+   * @return true if the rectangles intersects, false otherwise
+   */
+  rectIntersectsRect : function(r1, r2) {
+    return !(
+      r1.x > r2.x + r2.width || r1.x + r1.width < r2.x ||
+      r1.y + r1.height < r2.y || r1.y > r2.y + r2.height
+    );
+  },
+  /**
    * Check if they collide.
    * Thumb rule: Complexity of object1 <= object2 e.g. a point is less complex than a circle
    */
   inside : function(object1, object2) {
     if (object1 instanceof Vector && object2 instanceof Rectangle)
       return this.pointInRectangle(object1, object2);
+    else if (object1 instanceof Rectangle && object2 instanceof Rectangle)
+      return this.rectIntersectsRect(object1, object2);
     else
       console.log(object1 instanceof Vector);
   },
