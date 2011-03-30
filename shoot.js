@@ -48,7 +48,7 @@ var RenderEngine = function(canvas) {
   
   var timer = new Timer();
   
-  self.redraw = function() {
+  self.redraw = function(timeDelta) {
     timer.start();
     Collisions.runDetections();
     // l('redraw');
@@ -58,7 +58,7 @@ var RenderEngine = function(canvas) {
         self.scene[i][j].redraw(ctx);
     }
     timer.stop();
-    liveDebug.frameTime.text(timer.getTime());
+    liveDebug.frameTime.text(timeDelta);
   };
 };
 
@@ -77,7 +77,12 @@ $(document).ready(function() {
   thisPlayer.color = 'red';
   var crossHair = new CrossHair(thisPlayer);
   
-  var interval = setInterval(renderer.redraw, config.frameRate);
+  var lastTime = new Date().getMilliseconds();
+  var interval = setInterval(function() {
+    var timeDelta = new Date().getMilliseconds() - lastTime;
+    lastTime = new Date().getMilliseconds();
+    renderer.redraw(timeDelta);
+    }, config.frameRate);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
