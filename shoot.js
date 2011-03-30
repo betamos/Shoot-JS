@@ -55,7 +55,7 @@ var RenderEngine = function(canvas) {
     self.clear();
     for (var i in self.scene) {
       for (var j in self.scene[i])
-        self.scene[i][j].redraw(ctx);
+        self.scene[i][j].redraw(ctx, self.scene);
     }
     frameTime.stop();
     liveDebug.frameTime.text(frameTime.getTime());

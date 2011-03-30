@@ -28,7 +28,10 @@ var Player = Class.extend({
     // The side of the square of the bounding box which is affected by collision
     this.boundingBoxSize = 16;
   },
-  move : function() {
+  /**
+   * Array contraints a list of elements that cant be moved to
+   */
+  move : function(constraints) {
     var direction = new Vector();
     for (i in this.moveMent) {
       direction.add(this.moveMent[i]);
@@ -36,6 +39,10 @@ var Player = Class.extend({
     direction.setLength(1);
     direction.scale(this.speed);
     this.position.add(direction);
+    for (var i in constraints) {
+      if (Collisions.inside(this.exportShape(), constraints[i]))
+      this.position.add(direction.scale(-1));
+    }
   },
   appendMovement : function(direction) {
     if (this.moveMent.indexOf(direction) === -1)
@@ -46,8 +53,8 @@ var Player = Class.extend({
     if (pos >= 0)
       this.moveMent.splice(pos, 1);
   },
-  redraw : function(ctx) {
-    this.move();
+  redraw : function(ctx, scene) {
+    this.move(scene.houses);
     this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
     ctx.strokeStyle = this.color;
     ctx.lineWidth = 1;
