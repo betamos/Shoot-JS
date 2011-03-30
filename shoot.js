@@ -46,10 +46,10 @@ var RenderEngine = function(canvas) {
     ctx.fillRect(0, 0, config.canvasWidth, config.canvasHeight);
   };
   
-  var timer = new Timer();
+  var frameTime = new Timer();
   
   self.redraw = function(timeDelta) {
-    timer.start();
+    frameTime.start();
     Collisions.runDetections();
     // l('redraw');
     self.clear();
@@ -57,15 +57,17 @@ var RenderEngine = function(canvas) {
       for (var j in self.scene[i])
         self.scene[i][j].redraw(ctx);
     }
-    timer.stop();
-    liveDebug.frameTime.text(timeDelta);
+    frameTime.stop();
+    liveDebug.frameTime.text(frameTime.getTime());
+    liveDebug.fps.text(parseInt(1000 / timeDelta));
   };
 };
 
 $(document).ready(function() {
   
   liveDebug = {
-    frameTime : $('#frame-time')
+    frameTime : $('#frame-time'),
+    fps : $('#fps')
   };
   
   var canvas = $('<canvas />');
@@ -77,12 +79,14 @@ $(document).ready(function() {
   thisPlayer.color = 'red';
   var crossHair = new CrossHair(thisPlayer);
   
-  var lastTime = new Date().getMilliseconds();
+  var timer = new Timer();
+  timer.start();
   var interval = setInterval(function() {
-    var timeDelta = new Date().getMilliseconds() - lastTime;
-    lastTime = new Date().getMilliseconds();
-    renderer.redraw(timeDelta);
-    }, config.frameRate);
+    timer.stop();
+    lastTime = timer.getTime();
+    renderer.redraw(timer.getTime());
+    timer.start()
+  }, config.frameRate);
   
   canvas.mousemove(function(e) {
     var x = e.pageX - this.offsetLeft;
