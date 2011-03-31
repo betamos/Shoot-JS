@@ -85,6 +85,9 @@ var Vector = Class.extend({
     this.y = this.y * length / norm;
     return this;
   },
+  clone : function() {
+    return new Vector(this.x, this.y);
+  }
 });
 
 
