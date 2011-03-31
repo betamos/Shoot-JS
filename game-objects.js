@@ -113,9 +113,13 @@ var Grenade = PointVector.extend({
       this.color = 'orange';
       this.radius = 100;
     }
-    else {
+    else if (this.radius > 0) {
       this.radius -= 3;
       this.radius = Math.max(0, this.radius);
+    }
+    else {
+      // Call destroy callback
+      (this.destroy ? this.destroy() : null);
     }
   },
   redraw : function(ctx) {
@@ -173,6 +177,10 @@ var SmokeGrenade = PointVector.extend({
       // Stop emitting from this grenade
       setTimeout(function() {
         clearInterval(timer);
+        // Call destroy callback when all clouds are gone
+        setTimeout(function() {
+          (self.destroy ? self.destroy() : null);
+        }, self.cloudLifeTime);
       }, self.emitTime);
     }
   },

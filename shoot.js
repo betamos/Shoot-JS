@@ -162,6 +162,9 @@ $(document).ready(function() {
     direction.setLength(2);
     var grenade = new Grenade(thisPlayer.position, direction);
     renderer.scene.grenades.push(grenade);
+    grenade.destroy = function() {
+      removeArrayObject(renderer.scene.grenades, grenade);
+    };
   });
   
   // Smoke Grenade!
@@ -170,6 +173,9 @@ $(document).ready(function() {
     direction.setLength(2);
     var smokeGrenade = new SmokeGrenade(thisPlayer.position, direction);
     renderer.scene.smokeGrenades.push(smokeGrenade);
+    smokeGrenade.destroy = function() {
+      removeArrayObject(renderer.scene.smokeGrenades, smokeGrenade);
+    };
   });
   
   Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(bullet, house) {
