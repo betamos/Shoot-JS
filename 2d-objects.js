@@ -194,11 +194,14 @@ var Collisions = {
   /**
    * Start detecting collisions
    */
-  startDetect : function(array1, array2, callback) {
+  startDetect : function(o1, o2, callback, negate) {
+    var array1 = (o1 instanceof Array ? o1 : [o1]);
+    var array2 = (o2 instanceof Array ? o2 : [o2]);
     this.observedObjects.push({
       array1 : array1,
       array2 : array2,
-      callback : callback
+      callback : callback,
+      negate : negate || false
     });
   },
   runDetections : function() {
@@ -213,7 +216,7 @@ var Collisions = {
           for (var k = array2.length-1; k >= 0; k--) {
             var o2 = array2[k];
             // If these two objects collides
-            if (this.inside(o1.exportShape(), o2.exportShape())) {
+            if (this.inside(o1.exportShape(), o2.exportShape()) != negate) {
               // The user defined callback
               callback(o1, o2);
             }

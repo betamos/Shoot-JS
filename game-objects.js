@@ -31,11 +31,13 @@ var Player = Class.extend({
   /**
    * Array contraints a list of elements that cant be moved to
    */
-  move : function(constraints) {
+  move : function(constraints, gameField) {
     this.position.add(this.getDirection());
+    if (!Collisions.inside(this.exportShape(), gameField))
+      this.position.add(this.getDirection().scale(-1));
     for (var i in constraints) {
       if (Collisions.inside(this.exportShape(), constraints[i]))
-      this.position.add(this.getDirection().scale(-1));
+        this.position.add(this.getDirection().scale(-1));
     }
   },
   getDirection : function() {
@@ -56,9 +58,8 @@ var Player = Class.extend({
     if (pos >= 0)
       this.moveMent.splice(pos, 1);
   },
-  redraw : function(ctx, scene) {
-    this.move(scene.houses);
-    //this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
+  redraw : function(ctx, scene, gameField) {
+    this.move(scene.houses, gameField);
     ctx.strokeStyle = this.color;
     ctx.lineWidth = 3;
     ctx.beginPath();

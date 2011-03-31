@@ -12,6 +12,8 @@ var direction = {
 var config = {
   canvasWidth : 800,
   canvasHeight : 300,
+  gameWidth : 1000,
+  gameHeight : 1000,
   controls : { // W, A, S, D
     87 : direction.UP,
     68 : direction.RIGHT,
@@ -24,7 +26,7 @@ var config = {
 
 var liveDebug;
 
-var RenderEngine = function(canvas, center) {
+var RenderEngine = function(canvas, center, gameField) {
   var self = this;
   var ctx = canvas.getContext('2d');
   $(canvas).attr('width', config.canvasWidth);
@@ -56,10 +58,13 @@ var RenderEngine = function(canvas, center) {
     ctx.save();
     self.clear();
     ctx.translate(-1 * center.x + config.canvasWidth / 2, -1 * center.y + config.canvasHeight / 2);
+    
+    // Game field be colored separately, because the "walls" should be visible
+    gameField.fill(ctx, 'darkgrey');
     for (var i in self.scene) {
       for (var j in self.scene[i])
         // TODO: Need two methods, one updateFrame and one redraw
-        self.scene[i][j].redraw(ctx, self.scene);
+        self.scene[i][j].redraw(ctx, self.scene, gameField);
     }
     ctx.restore();
     frameTime.stop();
@@ -73,7 +78,15 @@ $(document).ready(function() {
   var mousePosition = {
     x : 0,
     y : 0
-  }
+  };
+  
+  var InvertedRectangle = Rectangle.extend({
+    exportShape : function() {
+      return this;
+    }
+  });
+  
+  var gameField = new InvertedRectangle(0, 0, config.gameWidth, config.gameHeight);
   
   liveDebug = {
     frameTime : $('#frame-time'),
@@ -87,7 +100,7 @@ $(document).ready(function() {
   thisPlayer.color = 'red';
   var crossHair = new CrossHair(thisPlayer);
 
-  var renderer = new RenderEngine(canvas.get(0), thisPlayer.position);
+  var renderer = new RenderEngine(canvas.get(0), thisPlayer.position, gameField);
   renderer.clear();
   
   var timer = new Timer();
@@ -178,6 +191,10 @@ $(document).ready(function() {
       removeArrayObject(renderer.scene.players, player);
     // TODO: If hit by self, reduce HP / die
   });
+  
+  Collisions.startDetect(renderer.scene.bullets, gameField, function(bullet) {
+    removeArrayObject(renderer.scene.bullets, bullet);
+  }, true);
 
   renderer.scene.houses.push(block1);
   renderer.scene.houses.push(block2);
