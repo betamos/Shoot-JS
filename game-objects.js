@@ -60,13 +60,13 @@ var Player = Class.extend({
     this.move(scene.houses);
     //this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
     ctx.strokeStyle = this.color;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, 5, 0, 2 * Math.PI, false);
+    ctx.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI, false);
     ctx.stroke();
   },
   exportShape : function() {
-    return new Circle(this.position, 5);
+    return new Circle(this.position, 10);
   }
 });
 
@@ -74,7 +74,7 @@ var Bullet = PointVector.extend({
   init : function(position, direction) {
     this.shape = 'point';
     this.color = 'yellow';
-    this.speed = 2;
+    this.speed = 4;
     this._super(position, direction.scale(this.speed));
   },
   move : function() {
