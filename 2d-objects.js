@@ -80,9 +80,10 @@ var Vector = Class.extend({
     var norm = this.norm();
     // Don't affect the zero vector
     if (norm === 0)
-      return;
+      return this;
     this.x = this.x * length / norm;
     this.y = this.y * length / norm;
+    return this;
   },
 });
 
