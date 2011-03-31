@@ -90,6 +90,43 @@ var Bullet = PointVector.extend({
   }
 });
 
+var Grenade = PointVector.extend({
+  init : function(position, direction) {
+    this.shape = 'point';
+    this.color = 'darkgreen';
+    this.speed = 4.0;
+    this.friction = 0.1;
+    this.exploding = false;
+    this.radius = 5;
+    this._super(position, direction.scale(this.speed));
+  },
+  move : function() {
+    if (this.speed > 0 && this.exploding == false) {
+      this.speed = Math.max(0, this.speed - this.friction);
+      this.position.add(this.direction.setLength(this.speed));
+    }
+    else if (!this.exploding) {
+      this.exploding = true;
+      this.color = 'orange';
+      this.radius = 100;
+    }
+    else {
+      this.radius -= 3;
+      this.radius = Math.max(0, this.radius);
+    }
+  },
+  redraw : function(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    this.move();
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.fill();
+  },
+  exportShape : function() {
+    return this.position;
+  }
+});
+
 var Block = Rectangle.extend({
   shape : 'rectangle',
   redraw : function(ctx) {
