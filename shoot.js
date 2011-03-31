@@ -36,6 +36,7 @@ var RenderEngine = function(canvas) {
   // Ascending from bottom to top in z-index
   self.scene = {
     bullets : [],
+    grenades : [],
     houses : [],
     players : [],
     hud : [],
@@ -128,6 +129,14 @@ $(document).ready(function() {
     var bullet = new Bullet(thisPlayer.position, direction);
     renderer.scene.bullets.push(bullet);
     // TODO: return false?
+  });
+  
+  // Grenade!
+  $(window).bind('keydown', 'g', function() {
+    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
+    direction.setLength(2);
+    var grenade = new Grenade(thisPlayer.position, direction);
+    renderer.scene.grenades.push(grenade);
   });
   
   Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(bullet, house) {
