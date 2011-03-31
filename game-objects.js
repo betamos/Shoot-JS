@@ -32,17 +32,20 @@ var Player = Class.extend({
    * Array contraints a list of elements that cant be moved to
    */
   move : function(constraints) {
+    this.position.add(this.getDirection());
+    for (var i in constraints) {
+      if (Collisions.inside(this.exportShape(), constraints[i]))
+      this.position.add(this.getDirection().scale(-1));
+    }
+  },
+  getDirection : function() {
     var direction = new Vector();
     for (i in this.moveMent) {
       direction.add(this.moveMent[i]);
     }
     direction.setLength(1);
     direction.scale(this.speed);
-    this.position.add(direction);
-    for (var i in constraints) {
-      if (Collisions.inside(this.exportShape(), constraints[i]))
-      this.position.add(direction.scale(-1));
-    }
+    return direction;
   },
   appendMovement : function(direction) {
     if (this.moveMent.indexOf(direction) === -1)
