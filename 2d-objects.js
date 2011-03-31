@@ -152,6 +152,28 @@ var Collisions = {
       r1.y + r1.height < r2.y || r1.y > r2.y + r2.height
     );
   },
+  pointIntersectsCircle : function(point, circle) {
+    var distance = point.clone().add(circle.position.clone().scale(-1)).norm();
+    if (distance < circle.radius)
+      return true;
+    else
+      return false;
+  },
+  circleIntersectsCircle : function(c1, c2) {
+    var distance = c1.position.clone().add(c2.position.clone().scale(-1)).norm();
+    if (distance < Math.max(c1.radius, c2.radius))
+      return true;
+    else
+      return false;
+  },
+  /**
+   * TEMPORARY: Treats circle as a point
+   */
+  circleIntersectsRectangle : function(circle, rect) {
+    //x,y are the point, l,r,b,t are the extents of the rectangle
+    var point = circle.position;
+    return point.x > rect.x && point.x < rect.x + rect.width && point.y > rect.y && point.y < rect.y + rect.height;
+  },
   /**
    * Check if they collide.
    * Thumb rule: Complexity of object1 <= object2 e.g. a point is less complex than a circle
@@ -161,8 +183,12 @@ var Collisions = {
       return this.pointInRectangle(object1, object2);
     else if (object1 instanceof Rectangle && object2 instanceof Rectangle)
       return this.rectIntersectsRect(object1, object2);
-    else
-      console.log(object1 instanceof Vector);
+    else if (object1 instanceof Vector && object2 instanceof Circle)
+      return this.pointIntersectsCircle(object1, object2);
+    else if (object1 instanceof Circle && object2 instanceof Circle)
+      return this.circleIntersectsCircle(object1, object2);
+    else if (object1 instanceof Circle && object2 instanceof Rectangle)
+      return this.circleIntersectsRectangle(object1, object2);
   },
   observedObjects : [],
   /**
