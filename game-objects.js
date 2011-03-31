@@ -132,6 +132,84 @@ var Grenade = PointVector.extend({
   }
 });
 
+var SmokeGrenade = PointVector.extend({
+  init : function(position, direction) {
+    this.shape = 'point';
+    this.color = 'white';
+    this.speed = 4.0;
+    this.friction = 0.1;
+    this.emitting = false;
+    this.radius = 5;
+    this.clouds = [];
+    this.cloudLifeTime = 3000; // Each cloud is alive for 5s
+    this.cloudEmitInterval = 200; // One new cloud every 150ms
+    this.cloudRadius = 5; // Cloud radius in px
+    this.emitTime = 15000; // Emitting for 30 s
+    this._super(position, direction.scale(this.speed));
+  },
+  move : function() {
+    if (this.speed > 0 && this.emitting == false) {
+      this.speed = Math.max(0, this.speed - this.friction);
+      this.position.add(this.direction.setLength(this.speed));
+    }
+    else if (!this.emitting) {
+      this.emitting = true;
+      var self = this;
+      var timer = setInterval(function() {
+        
+        // Emit new cloud
+        var cloud = new Circle(self.position, self.cloudRadius);
+        cloud.direction = new Vector(Math.random()-0.5, Math.random()-0.5);
+        cloud.opacity = 0.95;
+        self.clouds.push(cloud);
+
+        // Remove cloud
+        setTimeout(function() {
+          self.clouds.shift();
+        }, self.cloudLifeTime);
+      }, self.cloudEmitInterval);
+      
+      // Stop emitting from this grenade
+      setTimeout(function() {
+        clearInterval(timer);
+      }, self.emitTime);
+    }
+  },
+  redraw : function(ctx) {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    this.move();
+    this.moveClouds();
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
+    ctx.fill();
+    ctx.closePath();
+    this.drawClouds(ctx);
+  },
+  moveClouds : function() {
+    for (var i in this.clouds) {
+      this.clouds[i].position.add(this.clouds[i].direction);
+      // Attenuate cloud
+      this.clouds[i].radius += 1;
+      this.clouds[i].opacity *= 0.98;
+    }
+  },
+  drawClouds : function(ctx) {
+    for (var i in this.clouds) {
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, ' + this.clouds[i].opacity + ')';
+      
+      ctx.beginPath();
+      ctx.arc(this.clouds[i].position.x, this.clouds[i].position.y, this.clouds[i].radius, 0, 2 * Math.PI, false);
+      
+      ctx.fill();
+      ctx.closePath();
+    }
+  },
+  exportShape : function() {
+      return this.position;
+  }
+});
+
 var Block = Rectangle.extend({
   shape : 'rectangle',
   redraw : function(ctx) {

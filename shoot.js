@@ -39,6 +39,7 @@ var RenderEngine = function(canvas, center) {
     grenades : [],
     houses : [],
     players : [],
+    smokeGrenades : [],
     hud : [],
   };
   
@@ -148,6 +149,14 @@ $(document).ready(function() {
     direction.setLength(2);
     var grenade = new Grenade(thisPlayer.position, direction);
     renderer.scene.grenades.push(grenade);
+  });
+  
+  // Smoke Grenade!
+  $(window).bind('keydown', 'f', function() {
+    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
+    direction.setLength(2);
+    var smokeGrenade = new SmokeGrenade(thisPlayer.position, direction);
+    renderer.scene.smokeGrenades.push(smokeGrenade);
   });
   
   Collisions.startDetect(renderer.scene.bullets, renderer.scene.houses, function(bullet, house) {
