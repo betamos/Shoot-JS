@@ -58,7 +58,7 @@ var Player = Class.extend({
   },
   redraw : function(ctx, scene) {
     this.move(scene.houses);
-    this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
+    //this.exportShape().fill(ctx, 'rgba(255, 255, 255, 0.5)');
     ctx.strokeStyle = this.color;
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -66,8 +66,7 @@ var Player = Class.extend({
     ctx.stroke();
   },
   exportShape : function() {
-    return new Rectangle(this.position.x - this.boundingBoxSize / 2,
-      this.position.y - this.boundingBoxSize / 2, this.boundingBoxSize, this.boundingBoxSize);
+    return new Circle(this.position, 5);
   }
 });
 
@@ -126,7 +125,10 @@ var Grenade = PointVector.extend({
     ctx.fill();
   },
   exportShape : function() {
-    return this.position;
+    if (this.exploding)
+      return new Circle(this.position, this.radius);
+    else
+      return this.position;
   }
 });
 
