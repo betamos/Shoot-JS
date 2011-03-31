@@ -24,11 +24,11 @@ var config = {
 
 var liveDebug;
 
-var RenderEngine = function(canvas) {
+var RenderEngine = function(canvas, center) {
   var self = this;
-  var ctx = canvas.get(0).getContext('2d');
-  canvas.attr('width', config.canvasWidth);
-  canvas.attr('height', config.canvasHeight);
+  var ctx = canvas.getContext('2d');
+  $(canvas).attr('width', config.canvasWidth);
+  $(canvas).attr('height', config.canvasHeight);
   
   ctx.scale(1, -1);
   ctx.translate(0, -1 * config.canvasHeight);
@@ -52,12 +52,15 @@ var RenderEngine = function(canvas) {
   self.redraw = function(timeDelta) {
     frameTime.start();
     Collisions.runDetections();
-    // l('redraw');
+    ctx.save();
     self.clear();
+    ctx.translate(-1 * center.x + config.canvasWidth / 2, -1 * center.y + config.canvasHeight / 2);
     for (var i in self.scene) {
       for (var j in self.scene[i])
+        // TODO: Need two methods, one updateFrame and one redraw
         self.scene[i][j].redraw(ctx, self.scene);
     }
+    ctx.restore();
     frameTime.stop();
     liveDebug.frameTime.text(frameTime.getTime());
     liveDebug.fps.text(parseInt(1000 / timeDelta));
@@ -66,6 +69,11 @@ var RenderEngine = function(canvas) {
 
 $(document).ready(function() {
   
+  var mousePosition = {
+    x : 0,
+    y : 0
+  }
+  
   liveDebug = {
     frameTime : $('#frame-time'),
     fps : $('#fps')
@@ -73,27 +81,30 @@ $(document).ready(function() {
   
   var canvas = $('<canvas />');
   $('#game').append(canvas);
-  var renderer = new RenderEngine(canvas);
-  renderer.clear();
   
   var thisPlayer = new Player(100, 100);
   thisPlayer.color = 'red';
   var crossHair = new CrossHair(thisPlayer);
+
+  var renderer = new RenderEngine(canvas.get(0), thisPlayer.position);
+  renderer.clear();
   
   var timer = new Timer();
   timer.start();
   var interval = setInterval(function() {
     timer.stop();
     lastTime = timer.getTime();
+    with (mousePosition) {
+      crossHair.position.x = x + thisPlayer.position.x - config.canvasWidth / 2;
+      crossHair.position.y = y + thisPlayer.position.y - config.canvasHeight / 2;
+    }
     renderer.redraw(timer.getTime());
     timer.start()
   }, config.frameRate);
   
   canvas.mousemove(function(e) {
-    var x = e.pageX - this.offsetLeft;
-    var y = config.canvasHeight - (e.pageY - this.offsetTop);
-    crossHair.position.x = x;
-    crossHair.position.y = y;
+    mousePosition.x = e.pageX - this.offsetLeft;
+    mousePosition.y = config.canvasHeight - (e.pageY - this.offsetTop);
   });
   
   // canvas.css('cursor', 'none');
@@ -123,7 +134,7 @@ $(document).ready(function() {
   
   canvas.click(function(e) {
     // Shoot
-    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
+    var direction = crossHair.position.clone().add(thisPlayer.position.clone().scale(-1));
     // Rescale
     direction.setLength(4);
     var bullet = new Bullet(thisPlayer.position, direction);
@@ -147,6 +158,16 @@ $(document).ready(function() {
   Collisions.startDetect(renderer.scene.bullets, renderer.scene.players, function(bullet, player) {
     if (player !== thisPlayer)
       removeArrayObject(renderer.scene.players, player);
+  });
+  
+  Collisions.startDetect(renderer.scene.grenades, renderer.scene.houses, function(grenade, house) {
+    grenade.direction = new Vector();
+  });
+  
+  Collisions.startDetect(renderer.scene.players, renderer.scene.grenades, function(player, grenade) {
+    if (player != thisPlayer)
+      removeArrayObject(renderer.scene.players, player);
+    // TODO: If hit by self, reduce HP / die
   });
 
   renderer.scene.houses.push(block1);
