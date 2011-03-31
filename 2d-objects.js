@@ -118,6 +118,13 @@ var Rectangle = Class.extend({
   },
 });
 
+var Circle = Class.extend({
+  init : function(center, radius) {
+    this.position = center.clone();
+    this.radius = radius;
+  },
+});
+
 /**
  * Collision library
  */
