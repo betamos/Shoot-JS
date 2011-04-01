@@ -12,6 +12,7 @@ var Vector = Class.extend({
   init : function(x, y) {
     this.x = x || 0;
     this.y = y || 0;
+    this.typeID = 1; // TypeID is for comparison and collision detection
   },
   angle : function() {
     // Determine which quadrant the end point is in, if start point is origo
@@ -88,6 +89,7 @@ var PointVector = Class.extend({
   init : function(position, direction) {
     this.position = new Vector(position.x, position.y);
     this.direction = new Vector(direction.x, direction.y);
+    this.typeID = 2; // TypeID is for comparison and collision detection
   }
 });
 
@@ -97,6 +99,7 @@ var Rectangle = Class.extend({
     this.y = y;
     this.width = width;
     this.height = height;
+    this.typeID = 3; // TypeID is for comparison and collision detection
   },
   fill : function(ctx, color) {
     ctx.fillStyle = color;
@@ -108,6 +111,7 @@ var Circle = Class.extend({
   init : function(center, radius) {
     this.position = center.clone();
     this.radius = radius;
+    this.typeID = 4; // TypeID is for comparison and collision detection
   },
 });
 
@@ -135,7 +139,7 @@ var Collisions = {
       r1.y + r1.height < r2.y || r1.y > r2.y + r2.height
     );
   },
-  pointIntersectsCircle : function(point, circle) {
+  pointInCircle : function(point, circle) {
     var distance = point.clone().add(circle.position.clone().scale(-1)).norm();
     if (distance < circle.radius)
       return true;
@@ -144,7 +148,7 @@ var Collisions = {
   },
   circleIntersectsCircle : function(c1, c2) {
     var distance = c1.position.clone().add(c2.position.clone().scale(-1)).norm();
-    if (distance < Math.max(c1.radius, c2.radius))
+    if (distance < c1.radius + c2.radius)
       return true;
     else
       return false;
@@ -152,7 +156,7 @@ var Collisions = {
   /**
    * TEMPORARY: Treats circle as a point
    */
-  circleIntersectsRectangle : function(circle, rect) {
+  rectangleIntersectsCircle : function(rect, circle) {
     //x,y are the point, l,r,b,t are the extents of the rectangle
     var point = circle.position;
     return point.x > rect.x && point.x < rect.x + rect.width && point.y > rect.y && point.y < rect.y + rect.height;
@@ -162,16 +166,36 @@ var Collisions = {
    * Thumb rule: Complexity of object1 <= object2 e.g. a point is less complex than a circle
    */
   inside : function(object1, object2) {
+
+    // Use typeID to simplify comparisons
+    if (object1.typeID > object2.typeID) {
+      var temp = object1;
+      object1 = object2;
+      object2 = temp;
+    }
+
+    // Point in Rectangle
     if (object1 instanceof Vector && object2 instanceof Rectangle)
       return this.pointInRectangle(object1, object2);
+    
+    // Rectangle intersects Rectangle
     else if (object1 instanceof Rectangle && object2 instanceof Rectangle)
       return this.rectIntersectsRect(object1, object2);
-    else if (object1 instanceof Vector && object2 instanceof Circle)
-      return this.pointIntersectsCircle(object1, object2);
+    
+    // Point in Circle
+    else if (object1 instanceof Vector && object2 instanceof Circle) {
+      return this.pointInCircle(object1, object2);
+    }
+
+    // Circle intersects Circle
     else if (object1 instanceof Circle && object2 instanceof Circle)
       return this.circleIntersectsCircle(object1, object2);
-    else if (object1 instanceof Circle && object2 instanceof Rectangle)
-      return this.circleIntersectsRectangle(object1, object2);
+
+    // Circle intersects Rectangle
+    else if (object1 instanceof Rectangle && object2 instanceof Circle)
+      return this.rectangleIntersectsCircle(object1, object2);
+    else
+      return false;
   },
   observedObjects : [],
   /**
