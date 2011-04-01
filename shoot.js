@@ -142,9 +142,6 @@ $(document).ready(function() {
 
   $(window).bind('keydown', keyHandler);
   $(window).bind('keyup', keyHandler);
-
-  var block1 = new Block(10, 10, 100, 80);
-  var block2 = new Block(300, 100, 200, 75);
   
   canvas.click(function(e) {
     // Shoot
@@ -202,8 +199,13 @@ $(document).ready(function() {
     removeArrayObject(renderer.scene.bullets, bullet);
   }, true);
 
-  renderer.scene.houses.push(block1);
-  renderer.scene.houses.push(block2);
+  renderer.scene.houses.push(
+    new Block(10, 10, 100, 80),
+    new Block(200, 500, 100, 200),
+    new Block(275, 250, 100, 200),
+    new Block(500, 250, 80, 150),
+    new Block(300, 100, 200, 75)
+  );
   renderer.scene.hud.push(crossHair);
   renderer.scene.players.push(thisPlayer);
   renderer.scene.players.push(
