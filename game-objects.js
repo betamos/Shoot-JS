@@ -37,7 +37,7 @@ var Player = Class.extend({
       this.position.add(this.getDirection().scale(-1));
     for (var i in constraints) {
       if (Collisions.inside(this.exportShape(), constraints[i]))
-        this.position.add(this.getDirection().scale(-1));
+        this.position.subtract(this.getDirection());
     }
   },
   getDirection : function() {

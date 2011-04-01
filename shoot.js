@@ -145,7 +145,7 @@ $(document).ready(function() {
   
   canvas.click(function(e) {
     // Shoot
-    var direction = crossHair.position.clone().add(thisPlayer.position.clone().scale(-1));
+    var direction = crossHair.position.clone().subtract(thisPlayer.position);
     // Rescale
     direction.setLength(4);
     var bullet = new Bullet(thisPlayer.position, direction);
@@ -155,7 +155,7 @@ $(document).ready(function() {
   
   // Grenade!
   $(window).bind('keydown', 'g', function() {
-    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
+    var direction = crossHair.position.clone().subtract(thisPlayer.position);
     direction.setLength(2);
     var grenade = new Grenade(thisPlayer.position, direction);
     renderer.scene.grenades.push(grenade);
@@ -166,7 +166,7 @@ $(document).ready(function() {
   
   // Smoke Grenade!
   $(window).bind('keydown', 'f', function() {
-    var direction = new Vector().add(crossHair.position).add(new Vector().add(thisPlayer.position).scale(-1));
+    var direction = crossHair.position.clone().subtract(thisPlayer.position);
     direction.setLength(2);
     var smokeGrenade = new SmokeGrenade(thisPlayer.position, direction);
     renderer.scene.smokeGrenades.push(smokeGrenade);
