@@ -241,16 +241,3 @@ var Collisions = {
     }
   }
 };
-
-/**
- * 
-  collision : function() {
-    for (var i = this.collisions.length-1; i >= 0; i--) {
-      var position = this.collisions[i].object.position;
-      if (window.Collisions.inside(position.x, position.y, this.top, this.right, this.bottom, this.left)) {
-        this.collisions.splice(i, 1);
-        console.log('collision');
-      }
-    }
-  },
- */
