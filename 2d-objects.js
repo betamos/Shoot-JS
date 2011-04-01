@@ -101,6 +101,9 @@ var Rectangle = Class.extend({
     this.height = height;
     this.typeID = 3; // TypeID is for comparison and collision detection
   },
+  center : function() {
+    return new Vector(this.x + this.width / 2, this.y + this.height / 2);
+  },
   fill : function(ctx, color) {
     ctx.fillStyle = color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
