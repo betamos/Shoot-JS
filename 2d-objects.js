@@ -60,6 +60,11 @@ var Vector = Class.extend({
     this.y += vector.y;
     return this;
   },
+  subtract : function(vector) {
+    this.x -= vector.x;
+    this.y -= vector.y;
+    return this;
+  },
   setLength : function(length) {
     var norm = this.norm();
     // Don't affect the zero vector
