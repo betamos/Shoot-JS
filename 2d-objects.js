@@ -1,21 +1,4 @@
 
-
-/**
- * POINT
- */
-var Point = Class.extend({
-  init : function(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
-  },
-  // Return distance from this point to another point
-  distanceTo : function(p) {
-    return Math.sqrt(Math.pow(p.x - this.x, 2) + Math.pow(p.y - this.y, 2));
-  }
-});
-
-
-
 /**
  * VECTOR
  */
